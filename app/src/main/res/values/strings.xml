@@ -3,4 +3,7 @@
     <string name="save">Save</string>
     <string name="write_your_note">Write your note</string>
     <string name="undo">Undo</string>
+    <string name="secret_diary">Secret Diary</string>
+    <string name="log_in">LOG IN</string>
+    <string name="enter_pin">Enter PIN</string>
 </resources>
