@@ -2,6 +2,7 @@ package com.example.secretdiary
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.secretdiary.databinding.ActivityMainBinding
@@ -12,12 +13,21 @@ import kotlinx.datetime.toLocalDateTime
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private val listNotes = mutableListOf<Note>()
+    private var listNotes = mutableListOf<Note>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ModelPreferencesManager.with(application)
+        Log.d("my log", ModelPreferencesManager.toString())
+
+        val list = ModelPreferencesManager.get<Diary>(ModelPreferencesManager.KEY_DIARY)
+        if (list != null) {
+            listNotes = list.diary
+            updateDiaryTv()
+        }
 
         binding.saveBtn.setOnClickListener {
             val newText = binding.newWritingEt.text.toString()
@@ -25,7 +35,7 @@ class MainActivity : AppCompatActivity() {
             if (newText.isNotBlank())
                 postNote(newText)
             else
-                postToast()
+                showToast()
         }
 
         binding.undoBtn.setOnClickListener {
@@ -36,46 +46,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showUndoDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Remove last note")
-            .setMessage("Do you really want to remove the last writing? This operation cannot be undone!")
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                unpostNote()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
-    private fun unpostNote() {
-        removeNoteFromList()
-
-        updateTv()
-    }
-
-    private fun removeNoteFromList() {
-        listNotes.removeAt(0)
-    }
-
-    private fun postToast() {
-        val textToast = "Empty or blank input cannot be saved"
-        Toast.makeText(this, textToast, Toast.LENGTH_SHORT).show()
-    }
-
+    //post
     private fun postNote(newText: String) {
         addNoteToList(newText)
 
-        updateTv()
+        updateDiaryTv()
 
         binding.newWritingEt.setText("")
-    }
-
-    private fun updateTv() {
-        val text = listNotes.joinToString("\n\n") {
-            "${it.date} ${it.time}\n${it.note}"
-        }
-
-        binding.diaryTv.text = text
     }
 
     private fun addNoteToList(newText: String) {
@@ -91,5 +68,47 @@ class MainActivity : AppCompatActivity() {
         )
 
         listNotes.add(0, newNote)
+    }
+
+    private fun updateDiaryTv() {
+        val text = listNotes.joinToString("\n\n") {
+            "${it.date} ${it.time}\n${it.note}"
+        }
+
+        binding.diaryTv.text = text
+    }
+
+    private fun showUndoDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Remove last note")
+            .setMessage("Do you really want to remove the last writing? This operation cannot be undone!")
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                unpostNote()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    //unpost
+    private fun unpostNote() {
+        removeNoteFromList()
+
+        updateDiaryTv()
+    }
+
+    private fun removeNoteFromList() {
+        listNotes.removeAt(0)
+    }
+
+    private fun showToast() {
+        val textToast = "Empty or blank input cannot be saved"
+        Toast.makeText(this, textToast, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        val diary = Diary(listNotes)
+        ModelPreferencesManager.put(diary, ModelPreferencesManager.KEY_DIARY)
     }
 }
