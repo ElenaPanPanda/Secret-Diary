@@ -6,5 +6,6 @@
     <string name="secret_diary">Secret Diary</string>
     <string name="log_in">LOG IN</string>
     <string name="enter_pin">Enter PIN</string>
+    <string name="create_pin">Create your PIN</string>
     <string name="wrong_PIN_message">Wrong PIN!</string>
 </resources>

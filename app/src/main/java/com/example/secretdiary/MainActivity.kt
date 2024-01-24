@@ -2,7 +2,6 @@ package com.example.secretdiary
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.secretdiary.databinding.ActivityMainBinding
@@ -21,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         ModelPreferencesManager.with(application)
-        Log.d("my log", ModelPreferencesManager.toString())
 
         val list = ModelPreferencesManager.get<Diary>(ModelPreferencesManager.KEY_DIARY)
         if (list != null) {

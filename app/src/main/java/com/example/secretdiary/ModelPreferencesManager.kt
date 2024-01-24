@@ -12,6 +12,7 @@ object ModelPreferencesManager {
 
     private const val PREFERENCES_DIARY = "PREFERENCES_DIARY"
     const val KEY_DIARY = "KEY_DIARY"
+    const val KEY_PIN = "KEY_PIN"
 
     /**
      * Call this first before retrieving or saving object.

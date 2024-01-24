@@ -15,34 +15,70 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+
         val layoutPin = findViewById<TextInputLayout>(R.id.pin_log_layout)
         val pinEditText = findViewById<EditText>(R.id.pin_log_et)
         val loginButton = findViewById<Button>(R.id.login_btn)
 
-        // clear error message
-        pinEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                layoutPin.error = null
+        if (!havePIN()) {
+            layoutPin.hint = getString(R.string.create_pin)
+
+            loginButton.setOnClickListener {
+
+                rememberPIN(pinEditText.text.toString())
+
+                showDiaryActivity()
             }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        } else {
 
-        // click on LOG IN button
-        loginButton.setOnClickListener {
-            val pinCorrect = isPinCorrect(pinEditText.text.toString())
+            // clear error message
+            pinEditText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
 
-            if (pinCorrect)
-                showDiaryActivity()
-            else
-                showError(layoutPin)
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    layoutPin.error = null
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
+
+            // click on LOG IN button
+            loginButton.setOnClickListener {
+                val pinCorrect = isPinCorrect(pinEditText.text.toString())
+
+                if (pinCorrect)
+                    showDiaryActivity()
+                else
+                    showError(layoutPin)
+            }
         }
+
     }
 
-    private fun isPinCorrect(pin: String): Boolean = pin == PIN
 
+
+    private fun havePIN(): Boolean {
+        ModelPreferencesManager.with(application)
+
+        val pin = ModelPreferencesManager.get<String>(ModelPreferencesManager.KEY_PIN)
+
+        return pin != null
+    }
+
+    private fun rememberPIN(pin: String) {
+        ModelPreferencesManager.put(pin, ModelPreferencesManager.KEY_PIN)
+    }
+
+    private fun isPinCorrect(pin: String): Boolean =
+        pin == ModelPreferencesManager.get<String>(ModelPreferencesManager.KEY_PIN)
 
     private fun showDiaryActivity() {
         val intent = Intent(this, MainActivity::class.java)
