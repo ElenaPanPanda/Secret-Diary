@@ -63,8 +63,6 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-
-
     private fun havePIN(): Boolean {
         ModelPreferencesManager.with(application)
 
